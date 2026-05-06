@@ -1,9 +1,0 @@
-fastapi
-uvicorn
-python-multipart
-openai
-faster-whisper
-kokoro-onnx
-soundfile
-openpyxl
-numpy
