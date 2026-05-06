@@ -107,35 +107,35 @@ A YouTube-style overlay appears below the video showing:
 
 ---
 
-## 📁 Repository Structure
+## 📁 Project Structure
+
+Clone or copy this repo into a `LOGS` folder (e.g., `C:\Users\YOUR_USERNAME\Documents\LOGS\`). The code expects this exact structure:
 
 ```
-├── logger_server.py          # Main FastAPI backend (Whisper + vLLM + Kokoro + search + logging)
-├── search_engine.py          # MedVidSearch (synonym expansion + keyword indexing + LLM reranking)
-├── CameraViewerManager.cs    # Unity client (camera, voice, video playback, controls)
-├── download_videos.py        # Downloads all 744 medical videos from YouTube
+LOGS/
+├── logger_server.py          # Main FastAPI backend
+├── search_engine.py          # MedVidSearch engine
+├── download_videos.py        # Downloads medical videos from YouTube
 ├── requirements.txt          # Python dependencies
-├── SETUP_GUIDE.md            # Full step-by-step installation guide
-├── MedVid_Data/
+├── SETUP_GUIDE.md            # Full installation guide
+├── CameraViewerManager.cs    # Unity client script (for reference)
+├── Kokoro/                   # TTS model (download separately — see Setup Guide)
+│   ├── kokoro-v0_19.onnx     # ~310 MB
+│   └── voices.json           # ~27 MB (renamed from voices.bin)
+├── MedVid_DATA/
 │   ├── medical_db.json       # 2,566 questions mapped to video segments
-│   └── transcripts.json      # Full transcripts for all 744 videos
-└── Kokoro/                   # Download separately (see Setup Guide)
-    ├── kokoro-v0_19.onnx     # TTS model (~310 MB)
-    └── voices.json           # Voice configuration (~27 MB)
+│   ├── transcripts.json      # Full transcripts for all 744 videos
+│   └── videos/               # 744 .mp4 files (downloaded via download_videos.py)
+├── mission_log.xlsx          # Auto-created on first run
+└── Mission_Logs/             # Auto-created on first run
+    └── YYYY-MM-DD/
+        └── YYYY-MM-DD_HH-MM-SS/
+            ├── view_HH-MM-SS.jpg
+            ├── user_HH-MM-SS.wav
+            └── ai_HH-MM-SS.wav
 ```
 
-**Created at runtime:**
-```
-├── mission_log.xlsx          # ASU-styled Excel log with hyperlinks
-├── Mission_Logs/             # Date-organized session folders
-│   └── YYYY-MM-DD/
-│       └── YYYY-MM-DD_HH-MM-SS/
-│           ├── view_HH-MM-SS.jpg
-│           ├── user_HH-MM-SS.wav
-│           └── ai_HH-MM-SS.wav
-└── MedVid_Data/
-    └── videos/               # 744 .mp4 files (downloaded via download_videos.py)
-```
+> **Note:** `Kokoro/` models and `MedVid_DATA/videos/` are too large for GitHub. See [SETUP_GUIDE.md](SETUP_GUIDE.md) for download instructions.
 
 ---
 
