@@ -77,7 +77,7 @@ The AI receives the camera image and transcribed speech simultaneously. It produ
 Runs only when the AI says a video is needed AND the visual complaint is confirmed (or it's a knowledge question). Uses the AI's refined search topic with synonym expansion across 51 medical term groups.
 
 ### Phase 3: Response
-Context-aware spoken response using severity-appropriate prompts:
+Context-aware spoken response based on the situation:
 - **Medical + visible injury** → advice + loads video
 - **Medical + no visible injury** → asks user to show the area
 - **Knowledge question** → answers + loads video (image irrelevant)
@@ -110,86 +110,90 @@ A YouTube-style overlay appears below the video showing:
 ## 📁 Repository Structure
 
 ```
-├── logger_server.py          # Main FastAPI backend
-├── search_engine.py          # MedVidSearch (synonym expansion + LLM reranking)
-├── CameraViewerManager.cs    # Unity client (camera, voice, video, controls)
-├── DetectionManager.cs       # Unity YOLO object detection + AR markers
+├── logger_server.py          # Main FastAPI backend (Whisper + vLLM + Kokoro + search + logging)
+├── search_engine.py          # MedVidSearch (synonym expansion + keyword indexing + LLM reranking)
+├── CameraViewerManager.cs    # Unity client (camera, voice, video playback, controls)
+├── download_videos.py        # Downloads all 744 medical videos from YouTube
 ├── requirements.txt          # Python dependencies
-├── MedVid_DATA/
-│   ├── videos/               # 744 medical .mp4 files
-│   ├── transcripts.json      # Full transcripts for all 744 videos
-│   └── medical_db.json       # 2,566 questions mapped to video segments
-├── Kokoro/
-│   ├── kokoro-v0_19.onnx     # TTS model
-│   └── voices.json           # Voice configuration
+├── SETUP_GUIDE.md            # Full step-by-step installation guide
+├── MedVid_Data/
+│   ├── medical_db.json       # 2,566 questions mapped to video segments
+│   └── transcripts.json      # Full transcripts for all 744 videos
+└── Kokoro/                   # Download separately (see Setup Guide)
+    ├── kokoro-v0_19.onnx     # TTS model (~310 MB)
+    └── voices.json           # Voice configuration (~27 MB)
+```
+
+**Created at runtime:**
+```
+├── mission_log.xlsx          # ASU-styled Excel log with hyperlinks
 ├── Mission_Logs/             # Date-organized session folders
 │   └── YYYY-MM-DD/
 │       └── YYYY-MM-DD_HH-MM-SS/
 │           ├── view_HH-MM-SS.jpg
 │           ├── user_HH-MM-SS.wav
 │           └── ai_HH-MM-SS.wav
-└── mission_log.xlsx          # ASU-styled Excel log with hyperlinks
+└── MedVid_Data/
+    └── videos/               # 744 .mp4 files (downloaded via download_videos.py)
 ```
 
 ---
 
-## 🛠️ Installation
+## 🛠️ Quick Start
+
+> **📖 For complete step-by-step installation on a fresh machine, see [SETUP_GUIDE.md](SETUP_GUIDE.md)**
 
 ### Prerequisites
 - NVIDIA RTX 4090 (or equivalent with ≥24GB VRAM)
-- Ubuntu / WSL2 on Windows
+- Windows with WSL2 (Ubuntu)
 - Meta Quest 3 with developer mode enabled
 - ADB installed
 
-### 1. System Packages
+### 1. Install Dependencies
 ```bash
-sudo apt update && sudo apt install -y ffmpeg espeak-ng-data
+sudo apt update && sudo apt install -y ffmpeg espeak-ng espeak-ng-data
+pip install -r requirements.txt --break-system-packages
+pip install vllm --break-system-packages
+pip install yt-dlp --break-system-packages
 ```
 
-### 2. Python Dependencies
+### 2. Download Kokoro TTS Model
+Download `kokoro-v0_19.onnx` and `voices.bin` from the [Kokoro ONNX releases page](https://github.com/thewh1teagle/kokoro-onnx/releases/tag/model-files). Place them in a `Kokoro/` folder and rename `voices.bin` to `voices.json`.
+
+### 3. Download Medical Videos
 ```bash
-pip install -r requirements.txt
+python3 download_videos.py
 ```
 
-### 3. vLLM Model
+### 4. Update Paths
 ```bash
-pip install vllm
-# Model downloads automatically on first run
+sed -i 's/tbahaaal/YOUR_USERNAME/g' logger_server.py search_engine.py
 ```
 
----
+### 5. Run (3 Terminals)
 
-## 🚀 Running the System
-
-### Terminal 1 — Vision Model
+**Terminal 1 — vLLM:**
 ```bash
-vllm serve Qwen/Qwen3-VL-8B-Instruct \
-  --port 22002 \
-  --max-model-len 8192 \
-  --gpu-memory-utilization 0.9 \
-  --enforce-eager
+vllm serve Qwen/Qwen3-VL-8B-Instruct --port 22002 --max-model-len 8192 --gpu-memory-utilization 0.9 --enforce-eager
 ```
 
-### Terminal 2 — Backend Server
+**Terminal 2 — Backend:**
 ```bash
 python3 logger_server.py
 ```
 
-### Terminal 3 — Quest 3 Connection
-```bash
+**Terminal 3 — ADB:**
+```cmd
 adb reverse tcp:8000 tcp:8000
 ```
 
-Then launch the Unity app on the Quest 3. Hold A to speak, release to send.
+Put on Quest 3, launch the app, hold A to speak.
 
 ---
 
 ## 📊 Mission Log
 
 The system generates `mission_log.xlsx` styled in ASU Maroon (#8C1D40) & Gold (#FFC627):
-
-| Date | Time | Image | Video Used | Detected Items | User Question | AI Assessment | AI Answer | User Audio | AI Audio |
-|------|------|-------|------------|----------------|---------------|---------------|-----------|------------|----------|
 
 - **Image/Audio columns** are clickable hyperlinks to session files
 - **Video Used** links directly to the local .mp4 file
