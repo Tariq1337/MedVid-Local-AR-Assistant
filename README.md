@@ -236,5 +236,7 @@ All 744 video transcripts are loaded at startup. When you ask about a video you 
 - [Faster-Whisper](https://github.com/SYSTRAN/faster-whisper) — Speech-to-Text
 - [Kokoro-ONNX](https://github.com/thewh1teagle/kokoro-onnx) — Text-to-Speech
 - [vLLM](https://github.com/vllm-project/vllm) — LLM Serving Engine
+- [Unity Project](https://github.com/oculus-samples/Unity-PassthroughCameraApiSamples) — Unity-PassthroughCameraAPISamples
+
 
 **License:** MIT
