@@ -43,11 +43,11 @@ Quest 3 (Unity)                         Windows PC (RTX 4090)
 │ Camera Frame    │──── HTTP POST ────→ │ FastAPI Server (:8000)       │
 │ Microphone Audio│    /ask             │                              │
 │                 │                     │ 1. Faster-Whisper → text     │
-│ ← WAV audio ───│←── FileResponse ──← │ 2. Qwen3-VL → assessment    │
+│ ← WAV audio ─── │←── FileResponse ──← │ 2. Qwen3-VL → assessment     │
 │ ← HTTP headers  │    + headers        │ 3. MedVidSearch → video      │
-│   (video info)  │                     │ 4. Qwen3-VL → response      │
+│   (video info)  │                     │ 4. Qwen3-VL → response       │
 │                 │                     │ 5. Kokoro TTS → speech       │
-│ Video Player   │                     │ 6. Excel → log               │
+│ Video Player    │                     │ 6. Excel → log               │
 │ Object Detection│                     └──────────────────────────────┘
 └─────────────────┘
 ```
